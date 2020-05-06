@@ -160,6 +160,7 @@ export function viz({ steps, side, parent }) {
     el,
     setSteps,
     setSessionCurrentTime,
+    getCurrentStepInfo,
     getCurrentRpm,
   };
 }

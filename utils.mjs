@@ -8,12 +8,14 @@ export function sumProp(arr, propName) {
   return arr.reduce((prev, curr) => prev + curr[propName], 0);
 }
 
-export function toMinsSecs(t) {
+export function toMinsSecsInternal(t) {
   const mins = Math.floor(t / 60);
   const secs = t - mins * 60;
-  /* if (!mins) {
-    return secs;
-  }*/
+  return [mins, secs];
+}
+
+export function toMinsSecs(t) {
+  const [mins, secs] = toMinsSecsInternal(t);
   return `${mins}:${zeroPad(secs)}`;
 }
 

@@ -1,4 +1,5 @@
 import { speak } from './tts.mjs';
+import { describeStep } from './describe.mjs';
 import { plan } from './plan.mjs';
 import { processPlan } from './process-plan.mjs';
 import { play, isRunning, setTempo, getTempo } from './metronome.mjs';
@@ -19,8 +20,8 @@ const storage = storageFactory('rowMet');
 const programs = Object.keys(plan);
 let steps;
 let sessionTime = 0;
-
-let textComp, vizComp, program;
+let vizComp;
+let program;
 
 function onProgramChange(program_) {
   program = program_;
@@ -48,7 +49,14 @@ select({
   },
 });
 
+function speakCurrentStep() {
+  const { step } = vizComp.getCurrentStepInfo();
+  speak(describeStep(step));
+}
+
 function setupStep() {
+  speakCurrentStep();
+
   if (isInScheduler('viz-update')) {
     resumeScheduling();
   } else {
@@ -57,17 +65,22 @@ function setupStep() {
       duration: 1000 / 10,
       repeat: true,
       callback: ({ startedAt }, t) => {
-        sessionTime = (t - startedAt) / 1000;
+        sessionTime = (t - startedAt) / 100;
+
+        try {
+          vizComp.setSessionCurrentTime(sessionTime);
+        } catch (_) {
+          pause();
+          speak('you have completed your session. congratulations!');
+          return;
+        }
 
         const rpm = vizComp.getCurrentRpm();
-
-        // console.log(`TICK ${times} ${sessionTime.toFixed(1)} ${rpm}`);
-        vizComp.setSessionCurrentTime(sessionTime);
-
         const tempo = getTempo();
         if (rpm !== tempo / 2) {
           console.log('setting rpm to', rpm);
           setTempo(rpm * 2);
+          speakCurrentStep();
         }
       },
     });
@@ -82,8 +95,6 @@ function pause() {
 button({
   label: 'go',
   onClick: () => {
-    // speak('hello world');
-
     const rpm = vizComp.getCurrentRpm();
 
     const running = !isRunning();

@@ -1,7 +1,2 @@
-- fix end
-
+- rotate viz -90 deg
 - fix change program
-
-- add TTS
-  describe step
-  say current and next step
