@@ -1,5 +1,6 @@
 export const rpms = {
-  l: 20,
-  m: 23,
-  h: 26,
+  R: 0,
+  L: 20,
+  M: 23,
+  H: 26,
 };
