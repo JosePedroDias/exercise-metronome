@@ -1,0 +1,59 @@
+{
+  "name": "rowing-metronome",
+  "description": "a way to organize relationships in plots via a simple text format (ppl). generates graphviz dot output.",
+  "homepage": "https://github.com/josepedrodias/rowing-metronome",
+  "license": "CC-BY-4.0",
+  "version": "0.0.1",
+  "author": "José Pedro Dias <jose.pedro.dias@gmail.com>",
+  "main": "core.mjs",
+  "type": "module",
+  "bin": {
+    "ppl2gv": "bin/ppl2gv"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/josepedrodias/rowing-metronome"
+  },
+  "engines": {
+    "node": ">=12"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "jest": "latest",
+    "@babel/core": "latest",
+    "@babel/preset-env": "latest",
+    "babel-jest": "latest",
+    "babel-plugin-transform-default-import": "latest"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "mjs"
+    ],
+    "testMatch": [
+      "**/?(*.)+(spec|test).?(m)js"
+    ],
+    "transform": {
+      "^.+\\.mjs$": "<rootDir>/node_modules/babel-jest",
+      "^.+\\.js$": "<rootDir>/node_modules/babel-jest"
+    }
+  },
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "targets": {
+            "node": "current"
+          }
+        }
+      ]
+    ],
+    "plugins": [
+      "transform-default-import"
+    ]
+  }
+}
