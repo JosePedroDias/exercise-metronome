@@ -143,3 +143,7 @@ export function parse(tokens) {
 
   return parts;
 }
+
+export function processPlan(planStr) {
+  return parse(tokenize(planStr));
+}
