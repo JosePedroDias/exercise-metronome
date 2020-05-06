@@ -56,7 +56,7 @@ function setupStep() {
       name: 'viz-update',
       duration: 1000 / 10,
       repeat: true,
-      callback: ({ times, startedAt }, t) => {
+      callback: ({ startedAt }, t) => {
         sessionTime = (t - startedAt) / 1000;
 
         const rpm = vizComp.getCurrentRpm();
@@ -87,8 +87,6 @@ button({
     const rpm = vizComp.getCurrentRpm();
 
     const running = !isRunning();
-
-    console.log('clicked', rpm, running);
 
     if (running) {
       play({ tempo: rpm * 2 });

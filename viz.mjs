@@ -67,6 +67,8 @@ export function viz({ steps, side, parent }) {
   }
 
   function draw() {
+    ctx.fillStyle = 'black';
+
     ctx.clearRect(0, 0, side, side);
 
     ctx.font = `${FONT_SIZE_STEP}px ${FONT_FAMILY}`;
@@ -99,7 +101,9 @@ export function viz({ steps, side, parent }) {
       drawArc(cx, cy, r, angle, dAngle);
 
       const [tx, ty] = toPolar(cx, cy, r - 60, angle + dAngle / 2);
-      drawText(tx, ty, `${intensity} ${toMinsSecs(dur)}`);
+      // drawText(tx, ty, `${intensity} ${toMinsSecs(dur)}`);
+      ctx.fillStyle = color;
+      drawText(tx, ty, `${intensity}`);
 
       angle += dAngle;
     }
