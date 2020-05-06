@@ -12,7 +12,7 @@ const scheduleAheadTime = 0.1;
 const noteLength = 0.05;
 
 function nextNote() {
-  const secondsPerBeat = 60.0 / tempo;
+  const secondsPerBeat = 60.0 / tempo; // (tempo ? tempo : 0.0000000000000001);
   nextNoteTime += secondsPerBeat;
 }
 
@@ -33,7 +33,7 @@ function scheduler() {
   }
 }
 
-export function play(o) {
+export function play(o = {}) {
   if (o.tempo) {
     tempo = o.tempo;
   }
@@ -50,6 +50,7 @@ export function play(o) {
   }
 
   isPlaying = !isPlaying;
+  // console.log(`metronome -> ${isPlaying}`);
 
   if (isPlaying) {
     nextNoteTime = audioContext.currentTime;
@@ -59,6 +60,20 @@ export function play(o) {
     timerWorker.postMessage('stop');
     return 'play';
   }
+}
+
+export function getTempo() {
+  return tempo;
+}
+
+export function setTempo(tempo_) {
+  tempo = tempo_;
+  nextNoteTime = 0;
+  nextNote();
+}
+
+export function isRunning() {
+  return isPlaying;
 }
 
 function init() {

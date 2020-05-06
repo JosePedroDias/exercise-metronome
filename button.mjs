@@ -3,6 +3,8 @@ export function button({ label, parent, onClick }) {
   buttonEl.appendChild(document.createTextNode(label));
 
   buttonEl.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    ev.stopPropagation();
     return onClick?.(ev.target.value);
   });
 

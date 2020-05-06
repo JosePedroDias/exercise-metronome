@@ -14,8 +14,10 @@ const raf = (function () {
 let t = 0;
 const schedules = [];
 
+let pauseTime;
+
 // { name, duration, repeat, callback }
-export function add(schedule) {
+export function addToScheduler(schedule) {
   if (!schedule.name) {
     throw new Error('name is required!');
   }
@@ -32,11 +34,29 @@ export function add(schedule) {
   schedules.push(schedule);
 }
 
-export function remove(scheduleName) {
+export function isInScheduler(scheduleName) {
+  return schedules.findIndex((sch) => sch.name === scheduleName) !== -1;
+}
+
+export function removeFromScheduler(scheduleName) {
   const i = schedules.findIndex((sch) => sch.name === scheduleName);
   if (i !== -1) {
     schedules.splice(i, 1);
   }
+}
+
+export function pauseScheduling() {
+  pauseTime = t;
+}
+
+export function resumeScheduling() {
+  const dt = t - pauseTime;
+  for (let i = 0; i < schedules.length; ++i) {
+    const sch = schedules[i];
+    sch.firesAt += dt;
+    sch.startedAt += dt;
+  }
+  pauseTime = undefined;
 }
 
 function step(t_) {
@@ -44,11 +64,15 @@ function step(t_) {
 
   t = t_;
 
+  if (pauseTime) {
+    return;
+  }
+
   for (let i = 0; i < schedules.length; ++i) {
     const sch = schedules[i];
     if (t >= sch.firesAt) {
       ++sch.times;
-      sch.callback(sch);
+      sch.callback(sch, t);
       if (sch.repeat) {
         sch.firesAt = t + sch.duration;
       } else {

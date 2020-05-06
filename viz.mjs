@@ -23,6 +23,11 @@ export function viz({ steps, side, parent }) {
   const cy = side / 2;
   const r = side * 0.4;
 
+  const FONT_FAMILY = 'sans-serif';
+  const FONT_SIZE_LABEL = 24;
+  const FONT_SIZE_STEP = 40;
+  const FONT_SIZE_SESSION = 44;
+
   const colors = {
     R: 'green',
     L: 'yellow',
@@ -33,7 +38,6 @@ export function viz({ steps, side, parent }) {
   //ctx.lineCap = 'round';
   //ctx.lineJoin = 'round';
 
-  ctx.font = '20px sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
@@ -64,6 +68,23 @@ export function viz({ steps, side, parent }) {
 
   function draw() {
     ctx.clearRect(0, 0, side, side);
+
+    ctx.font = `${FONT_SIZE_STEP}px ${FONT_FAMILY}`;
+    {
+      const { step, stepTime } = getCurrentStepInfo();
+      const t = stepTime.toFixed(0);
+      const d = step.seconds;
+      drawText(cx, cy - 28, `${toMinsSecs(t)} / ${toMinsSecs(d - t)}`);
+    }
+
+    ctx.font = `${FONT_SIZE_SESSION}px ${FONT_FAMILY}`;
+    {
+      const t = sessionCurrentTime.toFixed(0);
+      const d = sessionDuration;
+      drawText(cx, cy + 40, `${toMinsSecs(t)} / ${toMinsSecs(d - t)}`);
+    }
+
+    ctx.font = `${FONT_SIZE_LABEL}px ${FONT_FAMILY}`;
 
     let angle = 0;
     ctx.lineWidth = lineWidth;
@@ -113,33 +134,28 @@ export function viz({ steps, side, parent }) {
     draw();
   }
 
-  function getCurrentStep() {
+  function getCurrentStepInfo() {
     let s = 0;
     for (let step of steps) {
-      // TODO TEST
-      if (s >= sessionCurrentTime && s + step.seconds <= sessionCurrentTime) {
-        return step;
+      if (sessionCurrentTime >= s && sessionCurrentTime <= s + step.seconds) {
+        return { step, stepTime: sessionCurrentTime - s };
       }
+      s += step.seconds;
     }
   }
 
   function getCurrentRpm() {
-    const step = getCurrentStep();
+    const { step } = getCurrentStepInfo();
     return rpms[step.intensity];
   }
 
   setSteps(steps);
   draw();
 
-  //setSessionCurrentTime(300);
-
-  console.log('getCurrentStep', getCurrentStep());
-  console.log('getCurrentRpm', getCurrentRpm());
-
-  /* {
-    let t = 0;
-    setInterval(() => setSessionTime((t += 10)), 1000);
-  } */
-
-  return { el, setSteps, setSessionCurrentTime, getCurrentStep, getCurrentRpm };
+  return {
+    el,
+    setSteps,
+    setSessionCurrentTime,
+    getCurrentRpm,
+  };
 }

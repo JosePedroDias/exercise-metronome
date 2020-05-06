@@ -11,9 +11,9 @@ export function sumProp(arr, propName) {
 export function toMinsSecs(t) {
   const mins = Math.floor(t / 60);
   const secs = t - mins * 60;
-  if (!mins) {
+  /* if (!mins) {
     return secs;
-  }
+  }*/
   return `${mins}:${zeroPad(secs)}`;
 }
 
