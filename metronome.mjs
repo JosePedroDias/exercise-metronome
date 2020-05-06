@@ -1,26 +1,75 @@
-const AudioContext = window.AudioContext || window.webkitAudioContext;
+let audioContext;
+let timerWorker;
+let unlocked = false;
+let isPlaying = false;
+let tempo;
+let lookahead = 25.0;
+let index = 0;
+let frequencies = [440, 880];
+let nextNoteTime = 0.0;
 
-export function metronome(rpm) {
-  const audioContext = new AudioContext();
+const scheduleAheadTime = 0.1;
+const noteLength = 0.05;
 
-  //const period = 1 / rpm;
+function nextNote() {
+  const secondsPerBeat = 60.0 / tempo;
+  nextNoteTime += secondsPerBeat;
+}
 
-  // https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createOscillator
-  const osc = audioContext.createOscillator();
+function scheduleNote(beatNumber, time) {
+  var osc = audioContext.createOscillator();
   osc.connect(audioContext.destination);
+  const freq = frequencies[beatNumber % frequencies.length];
+  osc.frequency.value = freq;
 
-  osc.frequency.value = 880.0;
-  //        osc.frequency.value = 440.0;
-  //        osc.frequency.value = 220.0;
+  osc.start(time);
+  osc.stop(time + noteLength);
+}
 
-  function tick() {
-    osc.start(0);
-    osc.stop(0 + 0.05);
+function scheduler() {
+  while (nextNoteTime < audioContext.currentTime + scheduleAheadTime) {
+    scheduleNote(index++, nextNoteTime);
+    nextNote();
+  }
+}
+
+export function play(o) {
+  if (o.tempo) {
+    tempo = o.tempo;
+  }
+  if (o.frequencies) {
+    frequencies = o.frequencies;
   }
 
-  return { tick };
+  if (!unlocked) {
+    var buffer = audioContext.createBuffer(1, 1, 22050);
+    var node = audioContext.createBufferSource();
+    node.buffer = buffer;
+    node.start(0);
+    unlocked = true;
+  }
 
-  /* osc.onended = function () {
-    console.log('Your tone has now stopped playing!');
-  }; */
+  isPlaying = !isPlaying;
+
+  if (isPlaying) {
+    nextNoteTime = audioContext.currentTime;
+    timerWorker.postMessage('start');
+    return 'stop';
+  } else {
+    timerWorker.postMessage('stop');
+    return 'play';
+  }
 }
+
+function init() {
+  audioContext = new AudioContext();
+  timerWorker = new Worker('worker.mjs');
+  timerWorker.onmessage = function (e) {
+    if (e.data == 'tick') {
+      scheduler();
+    } else console.log('message: ' + e.data);
+  };
+  timerWorker.postMessage({ interval: lookahead });
+}
+
+init();

@@ -6,37 +6,6 @@
     <title>rowing metronome</title>
   </head>
   <body>
-    <script type="module">
-      import { rpms } from './rpms.mjs';
-      import { plan } from './plan.mjs';
-      import { processPlan } from './process-plan.mjs';
-      import { metronome } from './metronome.mjs';
-      import { add } from './scheduler.mjs';
-
-      const program = 'w3 d1';
-      const steps = processPlan(plan[program]);
-      // console.log(steps);
-
-      const met = metronome();
-
-      add({
-        name: '2sec tick',
-        duration: 2000,
-        // repeat: true,
-        callback: ({ times }) => {
-          console.log(`TICK ${times}`);
-        },
-      });
-
-      add({
-        name: 'rpm',
-        duration: 1000 / 23,
-        repeat: true,
-        callback: ({ times }) => {
-          //console.log(`RPM ${times}`);
-          //met.tick();
-        },
-      });
-    </script>
+    <script type="module" src="index.mjs"></script>
   </body>
 </html>
