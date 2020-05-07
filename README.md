@@ -1,2 +1,13 @@
-https://github.com/cwilso/metronome/blob/master/js/metronome.js
-http://webaudiodemos.appspot.com/metronome/index.html
+# Exercise Metronome
+
+## Rowing
+
+## 7 min workout and other routines
+
+## TODO
+
+- 3, 2, 1...
+- fix change program
+- rotate viz -90 deg
+- instructions
+- 7 min exercise variant?
