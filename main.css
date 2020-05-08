@@ -1,8 +1,53 @@
+html,
 body {
-  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100%;
 }
 
-button,
+body {
+  font-family: sans-serif;
+  background: #333;
+}
+
+.top {
+  text-align: center;
+  margin-top: 2.5vh;
+  height: 5vh;
+  vertical-align: middle;
+  font-size: 23px;
+  font-weight: bold;
+}
+
+.R {
+  color: #73b1c0;
+}
+.L {
+  color: #dd4;
+}
+.M {
+  color: #d74;
+}
+.H {
+  color: #d44;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  height: 92vh;
+}
+
 select {
-  font-size: 20px;
+  font-size: 25px;
+  width: 8em;
+  height: 2em;
+}
+
+canvas {
+  pointer-events: none;
 }

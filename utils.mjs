@@ -22,3 +22,8 @@ export function toMinsSecs(t) {
 export function toPolar(x, y, r, angle) {
   return [r * Math.cos(angle * DEG2RAD) + x, r * Math.sin(angle * DEG2RAD) + x];
 }
+
+export function roundToPair(n) {
+  const rest = n % 2;
+  return n - rest;
+}

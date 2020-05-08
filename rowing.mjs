@@ -10,10 +10,13 @@ import {
   resumeScheduling,
 } from './scheduler.mjs';
 import { storageFactory } from './storage.mjs';
+import { roundToPair } from './utils.mjs';
 
 import { select } from './select.mjs';
-import { button } from './button.mjs';
 import { viz } from './viz.mjs';
+
+const topCtnEl = document.querySelector('.top');
+const mainCtnEl = document.querySelector('.main');
 
 const storage = storageFactory('rowMet');
 
@@ -30,7 +33,9 @@ function onProgramChange(program_) {
   steps = processPlan(plan[program]);
 
   if (!vizComp) {
-    vizComp = viz({ side: 600, steps });
+    const { width, height } = mainCtnEl.getBoundingClientRect();
+    const side = roundToPair(Math.min(width, height));
+    vizComp = viz({ parent: mainCtnEl, side, steps });
   } else {
     vizComp.setSteps(steps);
   }
@@ -42,6 +47,7 @@ function onProgramChange(program_) {
 const initiallySelected = storage.getItem('initiallySelected') || programs[0];
 
 select({
+  parent: topCtnEl,
   options: programs,
   initiallySelected,
   onSelected: (selection) => {
@@ -65,13 +71,13 @@ function setupStep() {
       duration: 1000 / 10,
       repeat: true,
       callback: ({ startedAt }, t) => {
-        sessionTime = (t - startedAt) / 100;
+        sessionTime = (t - startedAt) / 1000;
 
         try {
           vizComp.setSessionCurrentTime(sessionTime);
         } catch (_) {
           pause();
-          speak('you have completed your session. congratulations!');
+          speak('you have completed your session!');
           return;
         }
 
@@ -92,20 +98,20 @@ function pause() {
   pauseScheduling();
 }
 
-button({
-  label: 'go',
-  onClick: () => {
-    const rpm = vizComp.getCurrentRpm();
+function togglePause() {
+  const rpm = vizComp.getCurrentRpm();
 
-    const running = !isRunning();
+  const running = !isRunning();
+  vizComp.setPaused(!running);
 
-    if (running) {
-      play({ tempo: rpm * 2 });
-      setupStep();
-    } else {
-      pause();
-    }
-  },
-});
+  if (running) {
+    play({ tempo: rpm * 2 });
+    setupStep();
+  } else {
+    pause();
+  }
+}
+
+document.body.addEventListener('click', togglePause);
 
 onProgramChange(initiallySelected);

@@ -10,6 +10,10 @@ export function select({ options, initiallySelected, parent, onSelected }) {
     selectEl.appendChild(optionEl);
   }
 
+  selectEl.addEventListener('click', (ev) => {
+    ev.stopPropagation();
+  });
+
   selectEl.addEventListener('change', (ev) => {
     return onSelected?.(ev.target.value);
   });
