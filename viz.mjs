@@ -83,20 +83,30 @@ export function viz({ steps, side, parent }) {
 
     ctx.globalAlpha = getAlpha();
 
-    ctx.fillStyle = stepColor;
-    ctx.font = `${FONT_SIZE_STEP}px ${FONT_FAMILY}`;
-    {
-      const t = getCurrentStepCurrentTime().toFixed(0);
-      const d = getCurrentStepDuration();
-      drawText(cx, cy - side * 0.04, `${toMinsSecs(t)} / ${toMinsSecs(d - t)}`);
-    }
+    if (sessionDuration) {
+      ctx.fillStyle = stepColor;
+      ctx.font = `${FONT_SIZE_STEP}px ${FONT_FAMILY}`;
+      {
+        const t = getCurrentStepCurrentTime().toFixed(0);
+        const d = getCurrentStepDuration();
+        drawText(
+          cx,
+          cy - side * 0.04,
+          `${toMinsSecs(t)} / ${toMinsSecs(d - t)}`
+        );
+      }
 
-    ctx.fillStyle = sessionColor;
-    ctx.font = `${FONT_SIZE_SESSION}px ${FONT_FAMILY}`;
-    {
-      const t = getSessionCurrentTime().toFixed(0);
-      const d = sessionDuration;
-      drawText(cx, cy + side * 0.05, `${toMinsSecs(t)} / ${toMinsSecs(d - t)}`);
+      ctx.fillStyle = sessionColor;
+      ctx.font = `${FONT_SIZE_SESSION}px ${FONT_FAMILY}`;
+      {
+        const t = getSessionCurrentTime().toFixed(0);
+        const d = sessionDuration;
+        drawText(
+          cx,
+          cy + side * 0.05,
+          `${toMinsSecs(t)} / ${toMinsSecs(d - t)}`
+        );
+      }
     }
 
     ctx.font = `${FONT_SIZE_LABEL}px ${FONT_FAMILY}`;

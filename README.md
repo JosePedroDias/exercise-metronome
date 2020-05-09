@@ -6,12 +6,11 @@
 
 ## TODO
 
-- 3, 2, 1...
-- fix change program
-- instructions
-- training events centralized outside viz, to handle step transitions, speaking, 3, 2, 1. etc
+- halfway there, 3, 2, 1... at end of step
+- 3, 2, 1... before session
+- fix change program / play after ending
+- write some instro
 - 7 min exercise variant?
   - custom step rpms and durations
   - change step speed during session and record it
-  - time between steps (ex 10s)
   - shuffle steps

@@ -6,6 +6,7 @@ import { processPlan } from './process-plan.mjs';
 import {
   setSteps,
   setSessionCurrentTime,
+  getSessionDuration,
   getCurrentStep,
   getCurrentStepTimeLeft,
   getCurrentRpm,
@@ -14,6 +15,7 @@ import { play, isRunning, setTempo, getTempo } from './metronome.mjs';
 import {
   addToScheduler,
   isInScheduler,
+  removeFromScheduler,
   pauseScheduling,
   resumeScheduling,
 } from './scheduler.mjs';
@@ -75,35 +77,45 @@ function speakCurrentStep() {
   speak(describeStep(step2));
 }
 
+function onTick(sessionTime_) {
+  sessionTime = sessionTime_;
+  // console.log(`sessionTime: ${sessionTime.toFixed(1)}`);
+
+  if (sessionTime > getSessionDuration()) {
+    pause();
+    speak('you have completed your session!');
+
+    sessionTime = 0;
+    setSessionCurrentTime(sessionTime);
+    vizComp.update();
+
+    removeFromScheduler('tick');
+    return;
+  }
+
+  setSessionCurrentTime(sessionTime);
+  vizComp.update();
+
+  const rpm = getCurrentRpm();
+  const tempo = getTempo();
+  if (rpm !== tempo / 2) {
+    setTempo(rpm * 2);
+    speakCurrentStep();
+  }
+}
+
 function setupStep() {
   speakCurrentStep();
 
-  if (isInScheduler('viz-update')) {
+  if (isInScheduler('tick')) {
     resumeScheduling();
   } else {
     addToScheduler({
-      name: 'viz-update',
+      name: 'tick',
       duration: 1000 / 10,
       repeat: true,
       callback: ({ startedAt }, t) => {
-        sessionTime = (t - startedAt) / 1000;
-        console.log(`sessionTime: ${sessionTime.toFixed(1)}`);
-        try {
-          setSessionCurrentTime(sessionTime);
-          vizComp.update();
-        } catch (_) {
-          pause();
-          speak('you have completed your session!');
-          return;
-        }
-
-        const rpm = getCurrentRpm();
-        const tempo = getTempo();
-        if (rpm !== tempo / 2) {
-          console.log('setting rpm to', rpm);
-          setTempo(rpm * 2);
-          speakCurrentStep();
-        }
+        return onTick((t - startedAt) / 10);
       },
     });
   }
