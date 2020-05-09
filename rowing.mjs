@@ -1,6 +1,6 @@
 import { speak } from './tts.mjs';
 import { describeStep } from './describe.mjs';
-import { plan } from './plan.mjs';
+import { plan } from './rowing-plan.mjs';
 import { KEY_ENTER, KEY_SPACE } from './keys.mjs';
 import { processPlan } from './process-plan.mjs';
 import {
@@ -115,7 +115,7 @@ function setupStep() {
       duration: 1000 / 10,
       repeat: true,
       callback: ({ startedAt }, t) => {
-        return onTick((t - startedAt) / 10);
+        return onTick((t - startedAt) / 1000);
       },
     });
   }
