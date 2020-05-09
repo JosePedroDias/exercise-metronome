@@ -2,17 +2,20 @@
 
 const DEG2RAD = Math.PI / 180;
 
-import { sumProp, toPolar, toMinsSecs } from './utils.mjs';
-import { rpms } from './rpms.mjs';
+import { toPolar, toMinsSecs } from './utils.mjs';
+import {
+  getCurrentStepDuration,
+  getCurrentStepCurrentTime,
+  getSessionCurrentTime,
+  getSessionDuration,
+  getSessionPercentage,
+} from './session-manager.mjs';
 
 export function viz({ steps, side, parent }) {
   const el = document.createElement('canvas');
   el.setAttribute('width', side);
   el.setAttribute('height', side);
 
-  let percentage = 0;
-  let sessionCurrentTime = 0;
-  let sessionDuration;
   let isPaused = true;
 
   const ctx = el.getContext('2d');
@@ -74,6 +77,8 @@ export function viz({ steps, side, parent }) {
   }
 
   function draw() {
+    const sessionDuration = getSessionDuration();
+
     ctx.clearRect(0, 0, side, side);
 
     ctx.globalAlpha = getAlpha();
@@ -81,16 +86,15 @@ export function viz({ steps, side, parent }) {
     ctx.fillStyle = stepColor;
     ctx.font = `${FONT_SIZE_STEP}px ${FONT_FAMILY}`;
     {
-      const { step, stepTime } = getCurrentStepInfo();
-      const t = stepTime.toFixed(0);
-      const d = step.seconds;
+      const t = getCurrentStepCurrentTime().toFixed(0);
+      const d = getCurrentStepDuration();
       drawText(cx, cy - side * 0.04, `${toMinsSecs(t)} / ${toMinsSecs(d - t)}`);
     }
 
     ctx.fillStyle = sessionColor;
     ctx.font = `${FONT_SIZE_SESSION}px ${FONT_FAMILY}`;
     {
-      const t = sessionCurrentTime.toFixed(0);
+      const t = getSessionCurrentTime().toFixed(0);
       const d = sessionDuration;
       drawText(cx, cy + side * 0.05, `${toMinsSecs(t)} / ${toMinsSecs(d - t)}`);
     }
@@ -110,16 +114,16 @@ export function viz({ steps, side, parent }) {
       drawArc(cx, cy, r, angle, dAngle);
 
       const [tx, ty] = toPolar(cx, cy, r - 60, angle + dAngle / 2);
-      // drawText(tx, ty, `${intensity} ${toMinsSecs(dur)}`);
       ctx.fillStyle = color;
       drawText(tx, ty, `${intensity}`);
 
       angle += dAngle;
     }
 
-    angle = percentage * 360;
+    const sessionPercentage = getSessionPercentage();
+    angle = sessionPercentage * 360;
 
-    if (percentage) {
+    if (sessionPercentage) {
       ctx.lineWidth = lineWidth * 1.3;
       ctx.strokeStyle = bgColor;
       ctx.globalAlpha = 0.85 * getAlpha();
@@ -136,48 +140,26 @@ export function viz({ steps, side, parent }) {
     drawLine(ax, ay, bx, by);
   }
 
-  function setSteps(steps_) {
-    sessionDuration = sumProp(steps, 'seconds');
-    percentage = 0;
-    steps = steps_;
-    draw();
-  }
-
-  function setSessionCurrentTime(ct) {
-    sessionCurrentTime = ct;
-    percentage = Math.min(sessionDuration, Math.max(0, ct / sessionDuration));
-    draw();
-  }
-
-  function getCurrentStepInfo() {
-    let s = 0;
-    for (let step of steps) {
-      if (sessionCurrentTime >= s && sessionCurrentTime <= s + step.seconds) {
-        return { step, stepTime: sessionCurrentTime - s };
-      }
-      s += step.seconds;
-    }
-  }
-
-  function getCurrentRpm() {
-    const { step } = getCurrentStepInfo();
-    return rpms[step.intensity];
-  }
-
   function setPaused(isPaused_) {
     isPaused = isPaused_;
     draw();
   }
 
-  setSteps(steps);
+  function setSteps(steps_) {
+    steps = steps_;
+    draw();
+  }
+
+  function update() {
+    draw();
+  }
+
   draw();
 
   return {
     el,
     setSteps,
     setPaused,
-    setSessionCurrentTime,
-    getCurrentStepInfo,
-    getCurrentRpm,
+    update,
   };
 }

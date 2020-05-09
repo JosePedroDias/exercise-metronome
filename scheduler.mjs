@@ -30,7 +30,7 @@ export function addToScheduler(schedule) {
   schedule.times = 0;
   schedule.startedAt = t;
   schedule.firesAt = t + schedule.duration;
-  console.log(schedule);
+  // console.log(schedule);
   schedules.push(schedule);
 }
 

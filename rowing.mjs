@@ -3,6 +3,13 @@ import { describeStep } from './describe.mjs';
 import { plan } from './plan.mjs';
 import { KEY_ENTER, KEY_SPACE } from './keys.mjs';
 import { processPlan } from './process-plan.mjs';
+import {
+  setSteps,
+  setSessionCurrentTime,
+  getCurrentStep,
+  getCurrentStepTimeLeft,
+  getCurrentRpm,
+} from './session-manager.mjs';
 import { play, isRunning, setTempo, getTempo } from './metronome.mjs';
 import {
   addToScheduler,
@@ -33,7 +40,11 @@ function onProgramChange(program_) {
   program = program_;
   storage.setItem('initiallySelected', program);
 
+  sessionTime = 0;
   steps = processPlan(plan[program]);
+
+  setSteps(steps);
+  setSessionCurrentTime(sessionTime);
 
   if (!vizComp) {
     const { width, height } = mainCtnEl.getBoundingClientRect();
@@ -42,9 +53,6 @@ function onProgramChange(program_) {
   } else {
     vizComp.setSteps(steps);
   }
-
-  sessionTime = 0;
-  vizComp.setSessionCurrentTime(sessionTime);
 }
 
 const initiallySelected = storage.getItem('initiallySelected') || programs[0];
@@ -59,8 +67,12 @@ select({
 });
 
 function speakCurrentStep() {
-  const { step } = vizComp.getCurrentStepInfo();
-  speak(describeStep(step));
+  const step = getCurrentStep();
+  const step2 = {
+    ...step,
+    seconds: Math.floor(getCurrentStepTimeLeft()),
+  };
+  speak(describeStep(step2));
 }
 
 function setupStep() {
@@ -75,16 +87,17 @@ function setupStep() {
       repeat: true,
       callback: ({ startedAt }, t) => {
         sessionTime = (t - startedAt) / 1000;
-
+        console.log(`sessionTime: ${sessionTime.toFixed(1)}`);
         try {
-          vizComp.setSessionCurrentTime(sessionTime);
+          setSessionCurrentTime(sessionTime);
+          vizComp.update();
         } catch (_) {
           pause();
           speak('you have completed your session!');
           return;
         }
 
-        const rpm = vizComp.getCurrentRpm();
+        const rpm = getCurrentRpm();
         const tempo = getTempo();
         if (rpm !== tempo / 2) {
           console.log('setting rpm to', rpm);
@@ -96,19 +109,21 @@ function setupStep() {
   }
 }
 
-async function pause() {
+function pause() {
   play();
   pauseScheduling();
 
   cancelLock(wakeLockReq);
 }
 
-async function unpause() {
-  const rpm = vizComp.getCurrentRpm();
+function unpause() {
+  const rpm = getCurrentRpm();
   play({ tempo: rpm * 2 });
   setupStep();
 
-  wakeLockReq = await requestLock();
+  requestLock().then((wakeLockReq_) => {
+    wakeLockReq = wakeLockReq_;
+  });
 }
 
 function togglePause() {
@@ -133,7 +148,6 @@ document.body.addEventListener('keydown', (ev) => {
     if (kc === KEY_SPACE || KEY_ENTER) {
       togglePause();
     }
-    console.log(kc);
   }
 });
 
