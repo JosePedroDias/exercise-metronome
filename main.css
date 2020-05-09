@@ -9,6 +9,7 @@ body {
 body {
   font-family: sans-serif;
   background: #333;
+  color: #ddd;
 }
 
 .top {
@@ -50,4 +51,8 @@ select {
 
 canvas {
   pointer-events: none;
+}
+
+a {
+  color: #fff;
 }

@@ -1,6 +1,7 @@
 import { speak } from './tts.mjs';
 import { describeStep } from './describe.mjs';
 import { plan } from './plan.mjs';
+import { KEY_ENTER, KEY_SPACE } from './keys.mjs';
 import { processPlan } from './process-plan.mjs';
 import { play, isRunning, setTempo, getTempo } from './metronome.mjs';
 import {
@@ -11,6 +12,7 @@ import {
 } from './scheduler.mjs';
 import { storageFactory } from './storage.mjs';
 import { roundToPair } from './utils.mjs';
+import { requestLock, cancelLock } from './wake-lock.mjs';
 
 import { select } from './select.mjs';
 import { viz } from './viz.mjs';
@@ -25,6 +27,7 @@ let steps;
 let sessionTime = 0;
 let vizComp;
 let program;
+let wakeLockReq;
 
 function onProgramChange(program_) {
   program = program_;
@@ -93,25 +96,45 @@ function setupStep() {
   }
 }
 
-function pause() {
+async function pause() {
   play();
   pauseScheduling();
+
+  cancelLock(wakeLockReq);
+}
+
+async function unpause() {
+  const rpm = vizComp.getCurrentRpm();
+  play({ tempo: rpm * 2 });
+  setupStep();
+
+  wakeLockReq = await requestLock();
 }
 
 function togglePause() {
-  const rpm = vizComp.getCurrentRpm();
-
   const running = !isRunning();
   vizComp.setPaused(!running);
 
   if (running) {
-    play({ tempo: rpm * 2 });
-    setupStep();
+    unpause();
   } else {
     pause();
   }
 }
 
 document.body.addEventListener('click', togglePause);
+
+document.body.addEventListener('keydown', (ev) => {
+  const kc = ev.keyCode;
+  const hasModifiers = Boolean(
+    ev.shiftKey || ev.altKey || ev.ctrlKey || ev.metaKey
+  );
+  if (!hasModifiers) {
+    if (kc === KEY_SPACE || KEY_ENTER) {
+      togglePause();
+    }
+    console.log(kc);
+  }
+});
 
 onProgramChange(initiallySelected);
