@@ -29,6 +29,12 @@ There are 4 kinds of activity:
 Whenever you enter on a new part of the session, coach calls it out and tweaks the metronome (each stroke does a low and a high tick so you sync with your movement).  
 That's it!
 
+![screnshot](public/rowing-shot.png)
+
+<video src="public/rowing-demo.mp4" controls></video>
+
+[use it now](https://josepedrodias.github.io/exercise-metronome/rowing.html)
+
 ## 7 min workout and other routines
 
 Haven't funny fleshed out this one.
