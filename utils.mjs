@@ -1,7 +1,7 @@
 const DEG2RAD = Math.PI / 180;
 
 export function zeroPad(n) {
-  return n < 10 ? '0' + n : n;
+  return n < 10 ? '0' + n : '' + n;
 }
 
 export function sumProp(arr, propName) {
@@ -14,9 +14,10 @@ export function toMinsSecsInternal(t) {
   return [mins, secs];
 }
 
-export function toMinsSecs(t) {
+export function toMinsSecs(t, decimals = 0) {
   const [mins, secs] = toMinsSecsInternal(t);
-  return `${mins}:${zeroPad(secs)}`;
+  const secs2 = zeroPad(+secs.toFixed(decimals));
+  return `${mins}:${secs2.indexOf('.') === -1 ? secs2 + '.0' : secs2}`;
 }
 
 export function toPolar(x, y, r, angle) {

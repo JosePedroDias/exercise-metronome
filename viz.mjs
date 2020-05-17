@@ -87,24 +87,24 @@ export function viz({ steps, side, parent }) {
       ctx.fillStyle = stepColor;
       ctx.font = `${FONT_SIZE_STEP}px ${FONT_FAMILY}`;
       {
-        const t = getCurrentStepCurrentTime().toFixed(0);
+        const t = getCurrentStepCurrentTime();
         const d = getCurrentStepDuration();
         drawText(
           cx,
           cy - side * 0.04,
-          `${toMinsSecs(t)} / ${toMinsSecs(d - t)}`
+          `${toMinsSecs(t, 1)} / ${toMinsSecs(d - t, 1)}`
         );
       }
 
       ctx.fillStyle = sessionColor;
       ctx.font = `${FONT_SIZE_SESSION}px ${FONT_FAMILY}`;
       {
-        const t = getSessionCurrentTime().toFixed(0);
+        const t = getSessionCurrentTime();
         const d = sessionDuration;
         drawText(
           cx,
           cy + side * 0.05,
-          `${toMinsSecs(t)} / ${toMinsSecs(d - t)}`
+          `${toMinsSecs(t, 1)} / ${toMinsSecs(d - t, 1)}`
         );
       }
     }
