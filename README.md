@@ -38,6 +38,20 @@ That's it!
 
 Haven't funny fleshed out this one.
 
+## Aknowledgements
+
+Used an adapted version of [no-sleep](https://github.com/richtr/NoSleep.js) to avoid mobile turning screen off. 🙏
+
+## Dev
+
+    brew install mkcert
+    mkcert -install
+    mkcert localhost
+    npm i -g --only=prod https-localhost
+
+    npx https-localhost (prefix with sudo if in linux)
+    visit: https://localhost/
+
 ## TODO
 
 - halfway there, 3, 2, 1... at end of step

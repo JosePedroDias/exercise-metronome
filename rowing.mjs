@@ -1,3 +1,4 @@
+import { NoSleep } from './no-sleep.mjs';
 import { speak } from './tts.mjs';
 import { describeStep } from './describe.mjs';
 import { plan } from './rowing-plan.mjs';
@@ -21,7 +22,6 @@ import {
 } from './scheduler.mjs';
 import { storageFactory } from './storage.mjs';
 import { roundToPair } from './utils.mjs';
-import { requestLock, cancelLock } from './wake-lock.mjs';
 
 import { select } from './select.mjs';
 import { viz } from './viz.mjs';
@@ -36,7 +36,24 @@ let steps;
 let sessionTime = 0;
 let vizComp;
 let program;
-let wakeLockReq;
+
+const noSleep = new NoSleep();
+
+function setNoSleepOn() {
+  // must be called on UI event handler
+  document.addEventListener(
+    'click',
+    function enableNoSleep() {
+      document.removeEventListener('click', enableNoSleep, false);
+      noSleep.enable();
+    },
+    false
+  );
+}
+
+function setNoSleepOff() {
+  noSleep.disable();
+}
 
 function onProgramChange(program_) {
   program = program_;
@@ -122,20 +139,16 @@ function setupStep() {
 }
 
 function pause() {
+  setNoSleepOff();
   play();
   pauseScheduling();
-
-  cancelLock(wakeLockReq);
 }
 
 function unpause() {
+  setNoSleepOn();
   const rpm = getCurrentRpm();
   play({ tempo: rpm * 2 });
   setupStep();
-
-  requestLock().then((wakeLockReq_) => {
-    wakeLockReq = wakeLockReq_;
-  });
 }
 
 function togglePause() {
