@@ -1,7 +1,7 @@
 // https://simon.html5.org/dump/html5-canvas-cheat-sheet.html
 
 import { sumProp } from './utils.mjs';
-import { rpms } from './rpms.mjs';
+import { rpms } from './constants/rpms.mjs';
 
 let steps;
 let sessionCurrentTime = 0;

@@ -2,14 +2,18 @@
 
 const DEG2RAD = Math.PI / 180;
 
-import { toPolar, toMinsSecs } from './utils.mjs';
+import { toPolar, toMinsSecs } from '../utils.mjs';
 import {
   getCurrentStepDuration,
   getCurrentStepCurrentTime,
   getSessionCurrentTime,
   getSessionDuration,
   getSessionPercentage,
-} from './session-manager.mjs';
+} from '../session-manager.mjs';
+import { i18n } from '../constants/i18n.mjs';
+import { getLang } from '../get-lang.mjs';
+
+const intervalLabels = i18n[getLang()].intervalLabels;
 
 export function viz({ steps, side, parent }) {
   const el = document.createElement('canvas');
@@ -125,7 +129,7 @@ export function viz({ steps, side, parent }) {
 
       const [tx, ty] = toPolar(cx, cy, r - 60, angle + dAngle / 2);
       ctx.fillStyle = color;
-      drawText(tx, ty, `${intensity}`);
+      drawText(tx, ty, intervalLabels[intensity]);
 
       angle += dAngle;
     }

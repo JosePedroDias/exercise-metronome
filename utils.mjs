@@ -21,7 +21,7 @@ export function toMinsSecs(t, decimals = 0) {
 }
 
 export function toPolar(x, y, r, angle) {
-  return [r * Math.cos(angle * DEG2RAD) + x, r * Math.sin(angle * DEG2RAD) + x];
+  return [r * Math.cos(angle * DEG2RAD) + x, r * Math.sin(angle * DEG2RAD) + y];
 }
 
 export function roundToPair(n) {

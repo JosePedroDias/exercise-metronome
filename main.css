@@ -47,6 +47,7 @@ select {
   font-size: 25px;
   width: 8em;
   height: 2em;
+  background-color: #fff;
 }
 
 canvas {

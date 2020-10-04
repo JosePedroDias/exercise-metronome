@@ -3,7 +3,7 @@
   "description": "a web app to help using the ergometer. Carries a program and helps keeping the stroke rhythm with a tick sounds and a visualization diagram.",
   "homepage": "https://github.com/josepedrodias/rowing-metronome",
   "license": "CC-BY-4.0",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "José Pedro Dias <jose.pedro.dias@gmail.com>",
   "repository": {
     "type": "git",

@@ -1,4 +1,10 @@
 import { toMinsSecsInternal } from './utils.mjs';
+import { i18n } from './constants/i18n.mjs';
+import { getLang } from './get-lang.mjs';
+
+const lang = getLang();
+const words = i18n[lang].words;
+const intervalNames = i18n[lang].intervalNames;
 
 function pluralize(word, n) {
   return n === 1 ? word : word + 's';
@@ -8,25 +14,18 @@ export function describeTime(seconds) {
   const [mins, secs] = toMinsSecsInternal(seconds);
   const parts = [];
   if (mins) {
-    parts.push(`${mins} ${pluralize('minute', mins)}`);
+    parts.push(`${mins} ${pluralize(words.minute, mins)}`);
   }
   if (secs) {
-    parts.push(`${secs} ${pluralize('seconds', mins)}`);
+    parts.push(`${secs} ${pluralize(words.second, mins)}`);
   }
-  return parts.join(' and ');
+  return parts.join(` ${words.and} `);
 }
 
-const ints = {
-  R: 'rest',
-  L: 'low intensity rowing',
-  M: 'medium intensity rowing',
-  H: 'high intensity rowing',
-};
-
 export function describeIntensity(int) {
-  return ints[int];
+  return intervalNames[int];
 }
 
 export function describeStep({ seconds, intensity }) {
-  return `${describeTime(seconds)} of ${describeIntensity(intensity)}`;
+  return `${describeTime(seconds)} ${words.of} ${describeIntensity(intensity)}`;
 }

@@ -1,8 +1,8 @@
 import { NoSleep } from './no-sleep.mjs';
 import { speak } from './tts.mjs';
 import { describeStep } from './describe.mjs';
-import { plan } from './rowing-plan.mjs';
-import { KEY_ENTER, KEY_SPACE } from './keys.mjs';
+import { plan } from './constants/rowing-plan.mjs';
+import { KEY_ENTER, KEY_SPACE } from './constants/keys.mjs';
 import { processPlan } from './process-plan.mjs';
 import {
   setSteps,
@@ -21,21 +21,27 @@ import {
   resumeScheduling,
 } from './scheduler.mjs';
 import { storageFactory } from './storage.mjs';
+import { getLang } from './get-lang.mjs';
 import { roundToPair } from './utils.mjs';
 
-import { select } from './select.mjs';
-import { viz } from './viz.mjs';
-
-const topCtnEl = document.querySelector('.top');
-const mainCtnEl = document.querySelector('.main');
+import { select } from './ui/select.mjs';
+import { viz } from './ui/viz.mjs';
 
 const storage = storageFactory('rowMet');
+
+const t1El = document.querySelector('.top .t1');
+const t2El = document.querySelector('.top .t2');
+
+const mainCtnEl = document.querySelector('.main');
 
 const programs = Object.keys(plan);
 let steps;
 let sessionTime = 0;
 let vizComp;
 let program;
+
+const initiallySelectedProgramme =
+  storage.getItem('initiallySelected') || programs[0];
 
 const noSleep = new NoSleep();
 
@@ -74,14 +80,22 @@ function onProgramChange(program_) {
   }
 }
 
-const initiallySelected = storage.getItem('initiallySelected') || programs[0];
-
 select({
-  parent: topCtnEl,
+  parent: t1El,
   options: programs,
-  initiallySelected,
+  initiallySelected: initiallySelectedProgramme,
   onSelected: (selection) => {
     onProgramChange(selection);
+  },
+});
+
+select({
+  parent: t2El,
+  options: ['en', 'pt'],
+  initiallySelected: getLang(),
+  onSelected: (selection) => {
+    storage.setItem('lang', selection);
+    location.reload();
   },
 });
 
@@ -176,4 +190,4 @@ document.body.addEventListener('keydown', (ev) => {
   }
 });
 
-onProgramChange(initiallySelected);
+onProgramChange(initiallySelectedProgramme);
